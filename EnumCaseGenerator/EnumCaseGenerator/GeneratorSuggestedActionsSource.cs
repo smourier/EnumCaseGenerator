@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EnumCaseGenerator
 {
@@ -16,16 +17,16 @@ namespace EnumCaseGenerator
         private GeneratorSuggestedActionsSourceProvider _provider;
         private ITextView _textView;
         private ITextBuffer _textBuffer;
+        private Document _document;
 
         public event EventHandler<EventArgs> SuggestedActionsChanged;
 
-        public GeneratorSuggestedActionsSource(GeneratorSuggestedActionsSourceProvider provider, ITextView textView, ITextBuffer textBuffer)
+        public GeneratorSuggestedActionsSource(GeneratorSuggestedActionsSourceProvider provider, Document document, ITextView textView, ITextBuffer textBuffer)
         {
             _provider = provider;
+            _document = document;
             _textView = textView;
             _textBuffer = textBuffer;
-
-            //_textBuffer.AsTextContainer
         }
 
         private void OnSuggestedActionsChanged(object sender, EventArgs e)

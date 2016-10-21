@@ -31,7 +31,7 @@ namespace EnumCaseGenerator
         {
             get
             {
-                return true;
+                return false;
             }
         }
 
@@ -83,6 +83,43 @@ namespace EnumCaseGenerator
 
         public void Invoke(CancellationToken cancellationToken)
         {
+            var c = UriComponents.Fragment;
+
+            switch (c)
+            {
+                case UriComponents.Host:
+                    break;
+                case UriComponents.Port:
+                    break;
+                case UriComponents.Path:
+                    break;
+                case UriComponents.Query:
+                    break;
+                case UriComponents.Fragment:
+                    break;
+                case UriComponents.StrongPort:
+                    break;
+                case UriComponents.NormalizedHost:
+                    break;
+                case UriComponents.KeepDelimiter:
+                    break;
+                case UriComponents.SerializationInfoString:
+                    break;
+                case UriComponents.AbsoluteUri:
+                    break;
+                case UriComponents.HostAndPort:
+                    break;
+                case UriComponents.StrongAuthority:
+                    break;
+                case UriComponents.SchemeAndServer:
+                    break;
+                case UriComponents.HttpRequestUrl:
+                    break;
+                case UriComponents.PathAndQuery:
+                    break;
+                default:
+                    break;
+            }
         }
 
         public bool TryGetTelemetryId(out Guid telemetryId)

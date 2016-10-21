@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Utilities;
+using Microsoft.CodeAnalysis.Text;
 
 namespace EnumCaseGenerator
 {
@@ -32,7 +33,23 @@ namespace EnumCaseGenerator
             if (textBuffer == null && textView == null)
                 return null;
 
-            return new GeneratorSuggestedActionsSource(this, textView, textBuffer);
+            var ws = textBuffer.GetWorkspace();
+            if (ws == null)
+                return null;
+
+            var container = textBuffer.AsTextContainer();
+            if (container == null)
+                return null;
+
+            var documentId = ws.GetDocumentIdInCurrentContext(container);
+            if (documentId == null)
+                return null;
+
+            var document = ws.CurrentSolution.GetDocument(documentId);
+            if (document == null)
+                return null;
+
+            return new GeneratorSuggestedActionsSource(this, document, textView, textBuffer);
         }
     }
 }
