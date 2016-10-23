@@ -10,19 +10,21 @@ using System.Windows.Documents;
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.CodeAnalysis;
 
 namespace EnumCaseGenerator
 {
     internal class GeneratorSuggestedAction : ISuggestedAction
     {
-        private ITrackingSpan _span;
-        private ITextSnapshot _snapshot;
+        private SnapshotSpan _span;
+        private ITypeSymbol _type;
 
-        public GeneratorSuggestedAction(ITrackingSpan span)
+        public GeneratorSuggestedAction(SnapshotSpan span, ITypeSymbol type)
         {
             _span = span;
-            _snapshot = span.TextBuffer.CurrentSnapshot;
-            DisplayText = "Ensure all cases for enum text '" + span.GetText(_snapshot) + "'";
+            _type = type;
+            DisplayText = "Ensure all cases for enum type '" + _type.Name + "'";
         }
 
         public string DisplayText { get; private set; }
@@ -55,7 +57,7 @@ namespace EnumCaseGenerator
         {
             get
             {
-                return new ImageMoniker();
+                return KnownMonikers.EnumerationSnippet;
             }
         }
 
@@ -77,49 +79,12 @@ namespace EnumCaseGenerator
         {
             var textBlock = new TextBlock();
             textBlock.Padding = new Thickness(5);
-            textBlock.Inlines.Add(new Run() { Text = _span.GetText(_snapshot) });
+            textBlock.Inlines.Add(new Run() { Text = _type.Name });
             return Task.FromResult<object>(textBlock);
         }
 
         public void Invoke(CancellationToken cancellationToken)
         {
-            var c = UriComponents.Fragment;
-
-            switch (c)
-            {
-                case UriComponents.Host:
-                    break;
-                case UriComponents.Port:
-                    break;
-                case UriComponents.Path:
-                    break;
-                case UriComponents.Query:
-                    break;
-                case UriComponents.Fragment:
-                    break;
-                case UriComponents.StrongPort:
-                    break;
-                case UriComponents.NormalizedHost:
-                    break;
-                case UriComponents.KeepDelimiter:
-                    break;
-                case UriComponents.SerializationInfoString:
-                    break;
-                case UriComponents.AbsoluteUri:
-                    break;
-                case UriComponents.HostAndPort:
-                    break;
-                case UriComponents.StrongAuthority:
-                    break;
-                case UriComponents.SchemeAndServer:
-                    break;
-                case UriComponents.HttpRequestUrl:
-                    break;
-                case UriComponents.PathAndQuery:
-                    break;
-                default:
-                    break;
-            }
         }
 
         public bool TryGetTelemetryId(out Guid telemetryId)

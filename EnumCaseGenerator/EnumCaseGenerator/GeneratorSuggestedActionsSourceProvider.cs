@@ -17,39 +17,23 @@ namespace EnumCaseGenerator
     [ContentType("text")]
     public class GeneratorSuggestedActionsSourceProvider : ISuggestedActionsSourceProvider
     {
-        [ImportingConstructor]
-        public GeneratorSuggestedActionsSourceProvider(
-            [Import(typeof(SVsServiceProvider), AllowDefault = true)] IServiceProvider vsServiceProvider,
-            [Import(typeof(VisualStudioWorkspace), AllowDefault = true)] Workspace vsWorkspace)
-        {
-            var ws = vsWorkspace as VisualStudioWorkspace;
-        }
+        //[ImportingConstructor]
+        //public GeneratorSuggestedActionsSourceProvider(
+        //    [Import(typeof(SVsServiceProvider), AllowDefault = true)] IServiceProvider vsServiceProvider,
+        //    [Import(typeof(VisualStudioWorkspace), AllowDefault = true)] Workspace vsWorkspace)
+        //{
+        //    var ws = vsWorkspace as VisualStudioWorkspace;
+        //}
 
-        [Import(typeof(ITextStructureNavigatorSelectorService))]
-        internal ITextStructureNavigatorSelectorService NavigatorService { get; set; }
+        //[Import(typeof(ITextStructureNavigatorSelectorService))]
+        //internal ITextStructureNavigatorSelectorService NavigatorService { get; set; }
 
         public ISuggestedActionsSource CreateSuggestedActionsSource(ITextView textView, ITextBuffer textBuffer)
         {
             if (textBuffer == null && textView == null)
                 return null;
 
-            var ws = textBuffer.GetWorkspace();
-            if (ws == null)
-                return null;
-
-            var container = textBuffer.AsTextContainer();
-            if (container == null)
-                return null;
-
-            var documentId = ws.GetDocumentIdInCurrentContext(container);
-            if (documentId == null)
-                return null;
-
-            var document = ws.CurrentSolution.GetDocument(documentId);
-            if (document == null)
-                return null;
-
-            return new GeneratorSuggestedActionsSource(this, document, textView, textBuffer);
+            return new GeneratorSuggestedActionsSource(this, textView, textBuffer);
         }
     }
 }

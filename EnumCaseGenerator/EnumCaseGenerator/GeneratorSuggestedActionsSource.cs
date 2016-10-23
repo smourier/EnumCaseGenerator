@@ -1,4 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
@@ -17,14 +19,12 @@ namespace EnumCaseGenerator
         private GeneratorSuggestedActionsSourceProvider _provider;
         private ITextView _textView;
         private ITextBuffer _textBuffer;
-        private Document _document;
 
         public event EventHandler<EventArgs> SuggestedActionsChanged;
 
-        public GeneratorSuggestedActionsSource(GeneratorSuggestedActionsSourceProvider provider, Document document, ITextView textView, ITextBuffer textBuffer)
+        public GeneratorSuggestedActionsSource(GeneratorSuggestedActionsSourceProvider provider, ITextView textView, ITextBuffer textBuffer)
         {
             _provider = provider;
-            _document = document;
             _textView = textView;
             _textBuffer = textBuffer;
         }
@@ -34,33 +34,33 @@ namespace EnumCaseGenerator
             SuggestedActionsChanged?.Invoke(sender, e);
         }
 
-        private bool TryGetWordUnderCaret(out TextExtent wordExtent)
-        {
-            var view = _textView;
-            var buffer = _textBuffer;
-            if (view == null || buffer == null)
-            {
-                wordExtent = new TextExtent();
-                return false;
-            }
+        //private bool TryGetWordUnderCaret(out TextExtent wordExtent)
+        //{
+        //    var view = _textView;
+        //    var buffer = _textBuffer;
+        //    if (view == null || buffer == null)
+        //    {
+        //        wordExtent = new TextExtent();
+        //        return false;
+        //    }
 
-            ITextCaret caret = view.Caret;
-            SnapshotPoint point;
+        //    ITextCaret caret = view.Caret;
+        //    SnapshotPoint point;
 
-            if (caret.Position.BufferPosition > 0)
-            {
-                point = caret.Position.BufferPosition - 1;
-            }
-            else
-            {
-                wordExtent = default(TextExtent);
-                return false;
-            }
+        //    if (caret.Position.BufferPosition > 0)
+        //    {
+        //        point = caret.Position.BufferPosition - 1;
+        //    }
+        //    else
+        //    {
+        //        wordExtent = default(TextExtent);
+        //        return false;
+        //    }
 
-            ITextStructureNavigator navigator = _provider.NavigatorService.GetTextStructureNavigator(buffer);
-            wordExtent = navigator.GetExtentOfWord(point);
-            return true;
-        }
+        //    ITextStructureNavigator navigator = _provider.NavigatorService.GetTextStructureNavigator(buffer);
+        //    wordExtent = navigator.GetExtentOfWord(point);
+        //    return true;
+        //}
 
         public void Dispose()
         {
@@ -73,13 +73,62 @@ namespace EnumCaseGenerator
             return false;
         }
 
+        private bool HasSuggestedAction(SnapshotSpan range)
+        {
+            ITypeSymbol symbol;
+            return HasSuggestedAction(range, out symbol);
+        }
+
+        private bool HasSuggestedAction(SnapshotSpan range, out ITypeSymbol symbol)
+        {
+            symbol = null;
+            return false;
+            var ws = _textBuffer.GetWorkspace();
+            if (ws == null)
+                return false;
+
+            var container = _textBuffer.AsTextContainer();
+            if (container == null)
+                return false;
+
+            var documentId = ws.GetDocumentIdInCurrentContext(container);
+            if (documentId == null)
+                return false;
+
+            var document = ws.CurrentSolution.GetDocument(documentId);
+            if (document == null)
+                return false;
+
+            var root = document.GetSyntaxRootAsync().Result;
+
+            var switchNode = root.FindNode(new TextSpan(range.Start, range.Length)) as SwitchStatementSyntax;
+            if (switchNode == null || switchNode.Expression == null)
+                return false;
+
+            var model = document.GetSemanticModelAsync().Result;
+
+            var ti = model.GetTypeInfo(switchNode.Expression);
+            if (ti.ConvertedType == null || ti.ConvertedType.TypeKind != TypeKind.Enum)
+                return false;
+
+            symbol = ti.ConvertedType;
+            return true;
+        }
+
         public IEnumerable<SuggestedActionSet> GetSuggestedActions(ISuggestedActionCategorySet requestedActionCategories, SnapshotSpan range, CancellationToken cancellationToken)
         {
-            TextExtent extent;
-            if (TryGetWordUnderCaret(out extent) && extent.IsSignificant)
+            //TextExtent extent;
+            //if (TryGetWordUnderCaret(out extent) && extent.IsSignificant)
+            //{
+            //    ITrackingSpan trackingSpan = range.Snapshot.CreateTrackingSpan(extent.Span, SpanTrackingMode.EdgeInclusive);
+            //    var generateAction = new GeneratorSuggestedAction(trackingSpan);
+            //    return new SuggestedActionSet[] { new SuggestedActionSet(new ISuggestedAction[] { generateAction }) };
+            //}
+
+            ITypeSymbol symbol;
+            if (HasSuggestedAction(range, out symbol))
             {
-                ITrackingSpan trackingSpan = range.Snapshot.CreateTrackingSpan(extent.Span, SpanTrackingMode.EdgeInclusive);
-                var generateAction = new GeneratorSuggestedAction(trackingSpan);
+                var generateAction = new GeneratorSuggestedAction(range, symbol);
                 return new SuggestedActionSet[] { new SuggestedActionSet(new ISuggestedAction[] { generateAction }) };
             }
             return Enumerable.Empty<SuggestedActionSet>();
@@ -89,13 +138,13 @@ namespace EnumCaseGenerator
         {
             return Task.Factory.StartNew(() =>
             {
-                TextExtent extent;
-                if (TryGetWordUnderCaret(out extent))
-                {
-                    // don't display the action if the extent has whitespace
-                    return extent.IsSignificant;
-                }
-                return false;
+                //TextExtent extent;
+                //if (TryGetWordUnderCaret(out extent))
+                //{
+                //    // don't display the action if the extent has whitespace
+                //    return extent.IsSignificant;
+                //}
+                return HasSuggestedAction(range);
             });
         }
     }
