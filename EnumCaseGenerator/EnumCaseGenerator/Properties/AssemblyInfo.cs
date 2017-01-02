@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 #endif
 [assembly: AssemblyCompany("Simon Mourier")]
 [assembly: AssemblyProduct("EnumCaseGenerator")]
-[assembly: AssemblyCopyright("EnumCaseGenerator (C) 2016 Simon Mourier. All rights reserved.")]
+[assembly: AssemblyCopyright("EnumCaseGenerator (C) 2016-2017 Simon Mourier. All rights reserved.")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
 [assembly: AssemblyVersion("1.0.0.0")]

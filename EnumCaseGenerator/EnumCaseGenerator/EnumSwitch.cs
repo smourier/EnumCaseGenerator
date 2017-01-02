@@ -69,6 +69,15 @@ namespace EnumCaseGenerator
         public IReadOnlyList<IFieldSymbol> ExistingFields => _existingFields;
         public IReadOnlyList<IFieldSymbol> MissingFields => _missingFields;
 
+        public object GetConstantValue(string fieldName)
+        {
+            if (fieldName == null)
+                throw new ArgumentNullException(nameof(fieldName));
+
+            var symbol = EnumType.GetMembers(fieldName).OfType<IFieldSymbol>().FirstOrDefault();
+            return symbol != null && symbol.HasConstantValue ? symbol.ConstantValue : null;
+        }
+
         public static EnumSwitch Parse(SemanticModel model, SwitchStatementSyntax node)
         {
             if (model == null)
@@ -115,6 +124,9 @@ namespace EnumCaseGenerator
 
             public int Compare(IFieldSymbol x, IFieldSymbol y)
             {
+                if (ReferenceEquals(x, y))
+                    return 0;
+
                 if (x != null && y != null)
                 {
                     if (_alpha)
