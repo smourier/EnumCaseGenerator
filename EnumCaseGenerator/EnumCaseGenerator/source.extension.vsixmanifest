@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="EnumCaseGenerator.Simon Mourier.d709d8cb-dd76-4d44-ab2c-1fccffa6206f" Version="1.0.0.1" Language="en-US" Publisher="Simon Mourier" />
+    <Identity Id="EnumCaseGenerator.Simon Mourier.d709d8cb-dd76-4d44-ab2c-1fccffa6206e" Version="1.0.0.1" Language="en-US" Publisher="Simon Mourier" />
     <DisplayName>Enum Case Generator</DisplayName>
     <Description xml:space="preserve">A Visual Studio extension to generate missing enum cases in a switch statement.</Description>
     <MoreInfo>https://marketplace.visualstudio.com/items?itemName=SimonMourierSoftFluent.EnumCaseGenerator</MoreInfo>
