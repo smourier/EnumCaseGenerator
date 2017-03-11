@@ -6,4 +6,4 @@ A Visual Studio extension that has the following features:
  * sort the switch cases by enum's value
  * move the *default* case to the end
 
-The package can be directly installed from Visual Studio's marketplace here: https://marketplace.visualstudio.com/items?itemName=SimonMourierSoftFluent.EnumCaseGenerator
+The package can be directly installed from Visual Studio's marketplace here: https://marketplace.visualstudio.com/items?itemName=vs-publisher-591.EnumCaseGenerator
